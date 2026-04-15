@@ -1,8 +1,5 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-
-const DATA_PATH = path.join(process.cwd(), 'data.json');
+import { prisma } from '@/lib/prisma';
 
 // Helper to get initial data (same as store defaults)
 const getInitialData = () => {
@@ -37,24 +34,40 @@ const getInitialData = () => {
 
 export async function GET() {
   try {
-    if (!fs.existsSync(DATA_PATH)) {
+    let vault = await prisma.vault.findUnique({
+      where: { id: 1 },
+    });
+
+    if (!vault) {
       const initial = getInitialData();
-      fs.writeFileSync(DATA_PATH, JSON.stringify(initial, null, 2));
-      return NextResponse.json(initial);
+      vault = await prisma.vault.create({
+        data: {
+          id: 1,
+          data: initial as any,
+        },
+      });
     }
-    const data = fs.readFileSync(DATA_PATH, 'utf-8');
-    return NextResponse.json(JSON.parse(data));
+
+    return NextResponse.json(vault.data);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to read data' }, { status: 500 });
+    console.error('Database Error:', error);
+    return NextResponse.json({ error: 'Failed to read data from Supabase' }, { status: 500 });
   }
 }
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    fs.writeFileSync(DATA_PATH, JSON.stringify(body, null, 2));
+    
+    await prisma.vault.upsert({
+      where: { id: 1 },
+      update: { data: body },
+      create: { id: 1, data: body },
+    });
+
     return NextResponse.json({ success: true });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to save data' }, { status: 500 });
+    console.error('Database Error:', error);
+    return NextResponse.json({ error: 'Failed to save data to Supabase' }, { status: 500 });
   }
 }
