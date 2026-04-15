@@ -1,0 +1,13 @@
+{
+  "/api/vault/route": "app/api/vault/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/credentials/page": "app/credentials/page.js",
+  "/delivery/page": "app/delivery/page.js",
+  "/history/page": "app/history/page.js",
+  "/page": "app/page.js",
+  "/new-order/page": "app/new-order/page.js",
+  "/settings/page": "app/settings/page.js",
+  "/orders/page": "app/orders/page.js",
+  "/items/page": "app/items/page.js",
+  "/analytics/page": "app/analytics/page.js"
+}
